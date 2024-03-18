@@ -4,7 +4,8 @@
 #include <QObject>
 #include <QDebug>
 #include <interception.h>
-#include <utils.h>
+#include <windows.h>
+// #include <utils.h>
 
 enum ScanCode
 {

@@ -10,7 +10,7 @@ void KeyInterceptionWorker::doWork()
     InterceptionDevice device;
     InterceptionKeyStroke stroke;
 
-    raise_process_priority();
+    SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 
     context = interception_create_context();
 
