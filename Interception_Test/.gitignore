@@ -1,0 +1,14 @@
+# Qt generate file types
+
+build-*/*
+../build-*/*
+*.pro.user
+*.pro.user.*
+*.moc
+*.bin
+moc_*.cpp
+qrc_*.cpp
+ui_*.h
+Makefile*
+*-build-*
+../build-*
