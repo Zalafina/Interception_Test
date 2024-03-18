@@ -42,19 +42,19 @@ unsigned long calculate_busy_wait_millisecond(void)
 
 #pragma optimize("", on)
 
-void *try_open_single_program(const char *name) {
-    char full_name[255];
-    HANDLE program_instance;
+// void *try_open_single_program(const char *name) {
+//     char full_name[255];
+//     HANDLE program_instance;
 
-    strcpy(full_name, "Global\\{");
-    strcat(full_name, name);
-    strcat(full_name, "}");
-    program_instance = CreateMutexA(NULL, FALSE, full_name);
-    if (GetLastError() == ERROR_ALREADY_EXISTS || program_instance == NULL) {
-        return NULL;
-    }
-    return program_instance;
-}
+//     strcpy(full_name, "Global\\{");
+//     strcat(full_name, name);
+//     strcat(full_name, "}");
+//     program_instance = CreateMutexA(NULL, FALSE, full_name);
+//     if (GetLastError() == ERROR_ALREADY_EXISTS || program_instance == NULL) {
+//         return NULL;
+//     }
+//     return program_instance;
+// }
 
 void close_single_program(void *program_instance) {
     CloseHandle(program_instance);
