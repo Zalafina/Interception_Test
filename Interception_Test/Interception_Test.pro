@@ -14,11 +14,9 @@ INCLUDEPATH += $$PWD/Interception/utils
 
 HEADERS     += \
     Interception/include/interception.h \
-    Interception/utils/utils.h \
     keyinterceptionworker.h
 
 SOURCES += \
-    Interception/utils/utils.c \
     keyinterceptionworker.cpp
 
 contains(DEFINES, WIN64) {

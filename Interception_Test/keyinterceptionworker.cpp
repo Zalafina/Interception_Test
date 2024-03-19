@@ -38,11 +38,29 @@ void KeyInterceptionWorker::doWork()
     QString system32path = GetSystem32DirectoryPath();
     qDebug().nospace() << "[KeyInterceptionWorker] System32 Driver path :" << system32path;
 
-    InterceptionDeviceArray device_array = (InterceptionDeviceArray)context;
-
-    for(int i = INTERCEPTION_KEYBOARD(0); i <= INTERCEPTION_MAX_DEVICE; ++i)
+    wchar_t hardware_id[500];
+    QList<InterceptionDevice> keyboard_devicelist;
+    QList<InterceptionDevice> mouse_devicelist;
+    for(InterceptionDevice device = INTERCEPTION_KEYBOARD(0); device <= INTERCEPTION_MAX_DEVICE; ++device)
     {
+        if (interception_is_keyboard(device)) {
+            size_t length = interception_get_hardware_id(context, device, hardware_id, sizeof(hardware_id));
 
+            if(length > 0 && length < sizeof(hardware_id)) {
+                QString hardware_id_str = QString::fromWCharArray(hardware_id);
+                qDebug().nospace() << "[KeyInterceptionWorker] Valid Keyboard -> " << hardware_id_str;
+                keyboard_devicelist.append(device);
+            }
+        }
+        else if (interception_is_mouse(device)) {
+            size_t length = interception_get_hardware_id(context, device, hardware_id, sizeof(hardware_id));
+
+            if(length > 0 && length < sizeof(hardware_id)) {
+                QString hardware_id_str = QString::fromWCharArray(hardware_id);
+                qDebug().nospace() << "[KeyInterceptionWorker] Valid Mouse -> " << hardware_id_str;
+                mouse_devicelist.append(device);
+            }
+        }
     }
 
     interception_set_filter(context, interception_is_keyboard, INTERCEPTION_FILTER_KEY_ALL);
