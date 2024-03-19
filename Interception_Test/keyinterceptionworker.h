@@ -24,6 +24,9 @@ signals:
 
 public slots:
     void doWork(void);
+
+private:
+    bool exist_flag;
 };
 
 #endif // KEYINTERCEPTIONWORKER_H

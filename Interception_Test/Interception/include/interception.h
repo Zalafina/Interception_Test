@@ -157,6 +157,12 @@ typedef struct
     unsigned int information;
 } InterceptionKeyStroke;
 
+typedef struct
+{
+    void *handle;
+    void *unempty;
+} *InterceptionDeviceArray;
+
 typedef char InterceptionStroke[sizeof(InterceptionMouseStroke)];
 
 InterceptionContext INTERCEPTION_API interception_create_context(void);
