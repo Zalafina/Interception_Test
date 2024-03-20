@@ -48,8 +48,11 @@ void KeyInterceptionWorker::doWork()
 
             if(length > 0 && length < sizeof(hardware_id)) {
                 QString hardware_id_str = QString::fromWCharArray(hardware_id);
-                qDebug().nospace() << "[KeyInterceptionWorker] Valid Keyboard -> " << hardware_id_str;
+                qDebug().nospace() << "[KeyInterceptionWorker] Valid Keyboard[" << device << "] -> " << hardware_id_str;
                 keyboard_devicelist.append(device);
+            }
+            else {
+                qDebug().nospace() << "[KeyInterceptionWorker] Invalid Keyboard[" << device << "]";
             }
         }
         else if (interception_is_mouse(device)) {
@@ -57,8 +60,11 @@ void KeyInterceptionWorker::doWork()
 
             if(length > 0 && length < sizeof(hardware_id)) {
                 QString hardware_id_str = QString::fromWCharArray(hardware_id);
-                qDebug().nospace() << "[KeyInterceptionWorker] Valid Mouse -> " << hardware_id_str;
+                qDebug().nospace() << "[KeyInterceptionWorker] Valid Mouse[" << device << "] -> " << hardware_id_str;
                 mouse_devicelist.append(device);
+            }
+            else {
+                qDebug().nospace() << "[KeyInterceptionWorker] Invalid Mouse[" << device << "]";
             }
         }
     }
@@ -70,24 +76,28 @@ void KeyInterceptionWorker::doWork()
     {
         if(interception_is_keyboard(device))
         {
+            unsigned int keyboard_index = 1;
             InterceptionKeyStroke &kstroke = *(InterceptionKeyStroke *) &stroke;
             unsigned int ori_information = kstroke.information;
-            kstroke.information = 0xAAAA0001;
+            keyboard_index += device - INTERCEPTION_KEYBOARD(0);
+            kstroke.information = 0xAAAA0000 + keyboard_index;
             QString ori_extraInfoStr = QString("0x%1").arg(QString::number(ori_information, 16).toUpper(), 8, '0');
             QString extraInfoStr = QString("0x%1").arg(QString::number(kstroke.information, 16).toUpper(), 8, '0');
-            qDebug().nospace() << "[KeyInterceptionWorker] Keyboard change extraInfo [" << ori_extraInfoStr << " -> " << extraInfoStr << "]";
+            qDebug().nospace() << "[KeyInterceptionWorker] Keyboard[" << device << "] extraInfo (" << ori_extraInfoStr << " -> " << extraInfoStr << ")";
             interception_send(context, device, (InterceptionStroke *)&stroke, 1);
         }
 
         if(interception_is_mouse(device))
         {
+            unsigned int mouse_index = 1;
             InterceptionMouseStroke &mstroke = *(InterceptionMouseStroke *) &stroke;
             // unsigned int ori_information = mstroke.information;
-            mstroke.information = 0xBBBB0001;
+            mouse_index += device - INTERCEPTION_MOUSE(0);
+            mstroke.information = 0xBBBB0000 + mouse_index;
             // if (mstroke.state != 0) {
             //     QString ori_extraInfoStr = QString("0x%1").arg(QString::number(ori_information, 16).toUpper(), 8, '0');
             //     QString extraInfoStr = QString("0x%1").arg(QString::number(mstroke.information, 16).toUpper(), 8, '0');
-            //     qDebug().nospace() << "[KeyInterceptionWorker] Mouse change extraInfo [" << ori_extraInfoStr << " -> " << extraInfoStr << "]";
+            //     qDebug().nospace() << "[KeyInterceptionWorker] Mouse[" << device << "] extraInfo (" << ori_extraInfoStr << " -> " << extraInfoStr << ")";
             // }
             interception_send(context, device, (InterceptionStroke *)&stroke, 1);
         }
