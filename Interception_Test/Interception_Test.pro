@@ -37,6 +37,7 @@ LIBS        += -L$$PWD/win_lib/x64
 LIBS        += -L$$PWD/win_lib/x86
 }
 LIBS        += User32.lib
+LIBS        += SetupAPI.Lib
 # Add for Interception <<<
 
 SOURCES += \

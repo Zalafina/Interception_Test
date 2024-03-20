@@ -18,6 +18,49 @@ QString GetSystem32DirectoryPath()
     return QString::fromWCharArray(buffer);
 }
 
+QString GetDeviceNameByHardwareID(const QString& hardwareID)
+{
+    HDEVINFO deviceInfoSet = SetupDiGetClassDevs(nullptr, nullptr, nullptr, DIGCF_ALLCLASSES | DIGCF_PRESENT);
+    if (deviceInfoSet == INVALID_HANDLE_VALUE)
+    {
+        // 处理错误
+        return QString();
+    }
+
+    SP_DEVINFO_DATA deviceInfoData;
+    ZeroMemory(&deviceInfoData, sizeof(SP_DEVINFO_DATA));
+    deviceInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
+
+    DWORD index = 0;
+    while (SetupDiEnumDeviceInfo(deviceInfoSet, index, &deviceInfoData))
+    {
+        DWORD dataType;
+        WCHAR buffer[MAX_PATH];
+        DWORD bufferSize = sizeof(buffer);
+
+        if (SetupDiGetDeviceRegistryProperty(deviceInfoSet, &deviceInfoData, SPDRP_HARDWAREID,
+                                             &dataType, reinterpret_cast<PBYTE>(buffer), bufferSize, nullptr))
+        {
+            QString hardwareIdStr = QString::fromWCharArray(buffer);
+            if (hardwareIdStr == hardwareID)
+            {
+                if (SetupDiGetDeviceRegistryProperty(deviceInfoSet, &deviceInfoData, SPDRP_DEVICEDESC,
+                                                     &dataType, reinterpret_cast<PBYTE>(buffer), bufferSize, nullptr))
+                {
+                    QString deviceName = QString::fromWCharArray(buffer);
+                    SetupDiDestroyDeviceInfoList(deviceInfoSet);
+                    return deviceName;
+                }
+            }
+        }
+
+        index++;
+    }
+
+    SetupDiDestroyDeviceInfoList(deviceInfoSet);
+    return QString();
+}
+
 void KeyInterceptionWorker::doWork()
 {
     InterceptionContext context;
@@ -48,7 +91,9 @@ void KeyInterceptionWorker::doWork()
 
             if(length > 0 && length < sizeof(hardware_id)) {
                 QString hardware_id_str = QString::fromWCharArray(hardware_id);
-                qDebug().nospace() << "[KeyInterceptionWorker] Valid Keyboard[" << device << "] -> " << hardware_id_str;
+                QString devicename = GetDeviceNameByHardwareID(hardware_id_str);
+                qDebug().nospace() << "[KeyInterceptionWorker] Valid Keyboard[" << device << "] -> HardwareID: " << hardware_id_str << ", DeviceName: " << devicename;
+
                 keyboard_devicelist.append(device);
             }
             else {
@@ -60,7 +105,8 @@ void KeyInterceptionWorker::doWork()
 
             if(length > 0 && length < sizeof(hardware_id)) {
                 QString hardware_id_str = QString::fromWCharArray(hardware_id);
-                qDebug().nospace() << "[KeyInterceptionWorker] Valid Mouse[" << device << "] -> " << hardware_id_str;
+                QString devicename = GetDeviceNameByHardwareID(hardware_id_str);
+                qDebug().nospace() << "[KeyInterceptionWorker] Valid Mouse[" << device << "] -> HardwareID: " << hardware_id_str << ", DeviceName: " << devicename;
                 mouse_devicelist.append(device);
             }
             else {

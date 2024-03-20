@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <interception.h>
 #include <windows.h>
+#include <setupapi.h>
 // #include <utils.h>
 
 enum ScanCode
