@@ -81,7 +81,7 @@ void KeyInterceptionWorker::doWork()
     QString system32path = GetSystem32DirectoryPath();
     qDebug().nospace() << "[KeyInterceptionWorker] System32 Driver path :" << system32path;
 
-    wchar_t hardware_id[500];
+    WCHAR hardware_id[MAX_PATH];
     QList<InterceptionDevice> keyboard_devicelist;
     QList<InterceptionDevice> mouse_devicelist;
     for(InterceptionDevice device = INTERCEPTION_KEYBOARD(0); device <= INTERCEPTION_MAX_DEVICE; ++device)
