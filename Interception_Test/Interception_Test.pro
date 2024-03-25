@@ -11,9 +11,11 @@ CONFIG += c++17
 # Add for Interception >>>
 INCLUDEPATH += $$PWD/Interception/include
 INCLUDEPATH += $$PWD/Interception/utils
+INCLUDEPATH += $$PWD/libusb/include
 
 HEADERS     += \
     Interception/include/interception.h \
+    libusb/include/libusb.h \
     keyinterceptionworker.h
 
 SOURCES += \
@@ -22,11 +24,14 @@ SOURCES += \
 contains(DEFINES, WIN64) {
 # Interception x64 dll library
 LIBS        += -L$$PWD/Interception/lib/x64
+LIBS        += -L$$PWD/libusb/lib/x64
 } else {
 # Interception x86 dll library
 LIBS        += -L$$PWD/Interception/lib/x86
+LIBS        += -L$$PWD/libusb/lib/x86
 }
 LIBS    += interception.lib
+LIBS    += libusb-1.0.lib
 
 
 contains(DEFINES, WIN64) {

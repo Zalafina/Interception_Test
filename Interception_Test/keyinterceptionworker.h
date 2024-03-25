@@ -6,6 +6,7 @@
 #include <interception.h>
 #include <windows.h>
 #include <setupapi.h>
+#include <libusb.h>
 // #include <utils.h>
 
 enum ScanCode
@@ -20,6 +21,9 @@ class KeyInterceptionWorker : public QObject
     Q_OBJECT
 public:
     explicit KeyInterceptionWorker(QObject *parent = nullptr);
+    ~KeyInterceptionWorker();
+
+    void displayUSBDeviceStrings(libusb_device_handle *dev_handle);
 
 signals:
 

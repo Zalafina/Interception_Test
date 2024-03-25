@@ -3,7 +3,81 @@
 KeyInterceptionWorker::KeyInterceptionWorker(QObject *parent)
     : QObject{parent},
     exist_flag(false)
-{}
+{
+    int result = libusb_init(NULL);
+    if (result == 0) {
+        // libusb初始化成功
+        qDebug() << "libusb initialization success.";
+    } else {
+        // libusb初始化失败
+        qDebug() << "libusb initialization failed. Error code: " << result;
+        // 可以根据错误码进行相应的错误处理
+    }
+
+    uint16_t vendor_id = 0x0C45;
+    uint16_t product_id = 0x8073;
+    libusb_device_handle *dev_handle = libusb_open_device_with_vid_pid(NULL, vendor_id, product_id);
+    if (dev_handle == NULL)
+    {
+        qDebug() << "Failed to open USB device.";
+    }
+    else {
+        displayUSBDeviceStrings(dev_handle);
+
+        // 关闭USB设备
+        libusb_close(dev_handle);
+    }
+
+
+    vendor_id = 0x046D;
+    product_id = 0xC52F;
+    dev_handle = libusb_open_device_with_vid_pid(NULL, vendor_id, product_id);
+    if (dev_handle == NULL)
+    {
+        qDebug() << "Failed to open USB device.";
+    }
+    else {
+        displayUSBDeviceStrings(dev_handle);
+
+        // 关闭USB设备
+        libusb_close(dev_handle);
+    }
+}
+
+KeyInterceptionWorker::~KeyInterceptionWorker()
+{
+    libusb_exit(NULL);
+}
+
+void KeyInterceptionWorker::displayUSBDeviceStrings(libusb_device_handle *dev_handle)
+{
+    unsigned char manufacturer[256];
+    unsigned char product[256];
+
+    // 获取iManufacturer字符串描述符
+    int ret = libusb_get_string_descriptor_ascii(dev_handle, 1, manufacturer, sizeof(manufacturer));
+    if (ret > 0)
+    {
+        QString iManufacturer = QString::fromLatin1(reinterpret_cast<char*>(manufacturer), ret);
+        qDebug() << "iManufacturer: " << iManufacturer;
+    }
+    else
+    {
+        qDebug() << "Failed to get iManufacturer string descriptor: " << ret;
+    }
+
+    // 获取iProduct字符串描述符
+    ret = libusb_get_string_descriptor_ascii(dev_handle, 2, product, sizeof(product));
+    if (ret > 0)
+    {
+        QString iProduct = QString::fromLatin1(reinterpret_cast<char*>(product), ret);
+        qDebug() << "iProduct: " << iProduct;
+    }
+    else
+    {
+        qDebug() << "Failed to get iProduct string descriptor: " << ret;
+    }
+}
 
 QString GetSystem32DirectoryPath()
 {
@@ -78,8 +152,8 @@ void KeyInterceptionWorker::doWork()
         qDebug().nospace() << "[KeyInterceptionWorker] interception_create_context Success.";
     }
 
-    QString system32path = GetSystem32DirectoryPath();
-    qDebug().nospace() << "[KeyInterceptionWorker] System32 Driver path :" << system32path;
+    // QString system32path = GetSystem32DirectoryPath();
+    // qDebug().nospace() << "[KeyInterceptionWorker] System32 Driver path :" << system32path;
 
     WCHAR hardware_id[MAX_PATH];
     QList<InterceptionDevice> keyboard_devicelist;
